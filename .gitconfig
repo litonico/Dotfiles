@@ -1,0 +1,13 @@
+[user]
+	email = lito.nicolai@gmail.com
+	name = Lito Nicolai
+[push]
+	default = simple
+[alias]
+	lo = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit
+	st = status
+	aa = add -A
+	ci = commit
+    pull = pull --rebase
+    down = pull --rebase
+    onup = push

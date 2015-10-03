@@ -1,0 +1,9 @@
+*
+!.gitignore
+!.bash_profile
+!.vim/
+!.vimrc
+!.emacs.d/
+!.emacs
+!.inputrc
+!.gitconfig

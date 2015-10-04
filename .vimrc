@@ -8,7 +8,9 @@ filetype indent on
 set showcmd " Show the current command
 let mapleader=','
 
+set t_Co=256
 colorscheme jellybeans
+highlight Normal ctermbg=233
 set expandtab " In this floating world, all is spaces
 set tabstop=4 " See language sections for lang-specific tabs and shifts
 set shiftwidth=4
@@ -26,6 +28,7 @@ set foldlevel=1
 
 " Over-length lines highlighting
 set colorcolumn=81
+highlight ColorColumn ctermbg=52 
 " highlight OverLength ctermbg=red ctermfg=white guibg=#592929
 " match OverLength /\%81v.\+/
 
@@ -43,9 +46,15 @@ set shell=/bin/bash\ -li
 set wildignore+=Applications,.git,Desktop,Library,Music,Downloads,Builds,Classwork
 set wildignore+=Dropbox,Documents,Public,Pictures,Movies,Applications\ (Parallels)
 
+" Ctrl-P settings
+let g:ctrlp_working_path_mode = 'ra'
+
 " --- Key mappings ---
 inoremap jk <esc>
 cnoremap jk <esc>
+
+" Ctrl-P
+inoremap <leader>t :CtrlP pwd<CR>
 
 " 'x' command should never yank to a register; why the heck would it?
 " it now yanks into the black-hole register.

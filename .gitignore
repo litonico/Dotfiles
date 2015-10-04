@@ -2,6 +2,9 @@
 !.gitignore
 !.bash_profile
 !.vim/
+!.vim/bundle/*
+!.vim/color/*
+!.vim/autoload/*
 !.vimrc
 !.emacs.d/
 !.emacs

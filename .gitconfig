@@ -11,3 +11,5 @@
     pull = pull --rebase
     down = pull --rebase
     onup = push
+[core]
+	excludesfiles = ~/.gitignore_global

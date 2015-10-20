@@ -20,7 +20,7 @@ set ruler " Line and Character count
 " set paste " No auto-indent when pasting
 
 " Folding settings
-" (These don't really work, because vim
+" (These don't really work, because vim)
 set foldmethod=indent
 set foldnestmax=10
 set nofoldenable
@@ -54,19 +54,19 @@ inoremap jk <esc>
 cnoremap jk <esc>
 
 " Ctrl-P
-inoremap <leader>t :CtrlP pwd<CR>
+nnoremap <leader>t :CtrlP pwd<CR>
 
 " 'x' command should never yank to a register; why the heck would it?
 " it now yanks into the black-hole register.
 " Also good for visual mode deletion
 nnoremap x "_x
 
-" navigating between splits
+" Navigating between splits
 nnoremap <silent> <C-l> <C-w>l
 nnoremap <silent> <C-h> <C-w>h
 nnoremap <silent> <C-k> <C-w>k
 nnoremap <silent> <C-j> <C-w>j
-" splitting windows
+" Splitting windows
 nnoremap <silent> vv <C-w>v
 nnoremap <silent> vs <C-w>n
 
@@ -75,11 +75,10 @@ nnoremap n nzz
 nnoremap N Nzz
 nnoremap * *zz
 
-
 " Write and quit quickly
 " (Using ZZ is still better, though)
 nnoremap <silent> <leader>q <C-w>c
-nnoremap <silent> <leader>w :w<CR>
+" nnoremap <silent> <leader>w :w<CR>
 
 " I change my .vimrc lots!
 nnoremap vrc :new ~/.vimrc<CR>
@@ -109,6 +108,18 @@ function! InsertTabWrapper()
 endfunction
 inoremap <tab> <c-r>=InsertTabWrapper()<cr>
 inoremap <s-tab> <c-n>
+
+" --- Test runner ---
+function! RunTests()
+    :w
+    if filereadable("Rakefile")
+        exec ":!rake test"
+    elseif filereadable("test.rb")
+        exec ":!ruby test.rb"
+    end
+endfunction
+
+nnoremap <CR> :call RunTests()<CR>
 
 " --- Language and Build Settings ---
 

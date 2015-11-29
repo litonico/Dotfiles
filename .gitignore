@@ -6,7 +6,5 @@
 !.vim/color/*
 !.vim/autoload/*
 !.vimrc
-!.emacs.d/
-!.emacs
 !.inputrc
 !.gitconfig

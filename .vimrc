@@ -17,7 +17,6 @@ set shiftwidth=4
 set number " Line Numbers
 set ignorecase " I HATE case-sensitive search
 set ruler " Line and Character count
-" set paste " No auto-indent when pasting
 
 " Folding settings
 " (These don't really work, because vim)
@@ -28,7 +27,7 @@ set foldlevel=1
 
 " Over-length lines highlighting
 set colorcolumn=81
-highlight ColorColumn ctermbg=52 
+highlight ColorColumn ctermbg=52
 " highlight OverLength ctermbg=red ctermfg=white guibg=#592929
 " match OverLength /\%81v.\+/
 
@@ -39,12 +38,17 @@ set winheight=30
 set winwidth=84
 let NERDTreeWinSize = 31 " Size of the NT file browser, when it's up
 
-" Load Bash settings and $PATH
-set shell=/bin/bash\ -li
+" " Load Bash settings and $PATH
+" set shell=/bin/bash\ -li
 
 " Command-T/Ctrl-P ignores
+" Home dir stuff:
 set wildignore+=Applications,.git,Desktop,Library,Music,Downloads,Builds,Classwork
 set wildignore+=Dropbox,Documents,Public,Pictures,Movies,Applications\ (Parallels)
+" Actual ignores:
+set wildignore+=tmp
+" Rust builds:
+set wildignore+=target
 
 " Ctrl-P settings
 let g:ctrlp_working_path_mode = 'ra'
@@ -66,6 +70,7 @@ nnoremap <silent> <C-l> <C-w>l
 nnoremap <silent> <C-h> <C-w>h
 nnoremap <silent> <C-k> <C-w>k
 nnoremap <silent> <C-j> <C-w>j
+nnoremap <silent> <C-x> <C-w>x
 " Splitting windows
 nnoremap <silent> vv <C-w>v
 nnoremap <silent> vs <C-w>n
@@ -77,8 +82,8 @@ nnoremap * *zz
 
 " Write and quit quickly
 " (Using ZZ is still better, though)
-nnoremap <silent> <leader>q <C-w>c
-" nnoremap <silent> <leader>w :w<CR>
+"nnoremap <silent> <leader>q <C-w>c
+nnoremap <silent> <leader>w :w<CR>
 
 " I change my .vimrc lots!
 nnoremap vrc :new ~/.vimrc<CR>
@@ -106,20 +111,54 @@ function! InsertTabWrapper()
         return "\<c-p>"
     endif
 endfunction
+
 inoremap <tab> <c-r>=InsertTabWrapper()<cr>
 inoremap <s-tab> <c-n>
 
+let testfile = "test.rb" " TODO
 " --- Test runner ---
-function! RunTests()
+function! RubyTests()
     :w
-    if filereadable("Rakefile")
+    if filereadable("scripts/test")
+        exec ":!sh scripts/test"
+    elseif filereadable("Rakefile")
         exec ":!rake test"
     elseif filereadable("test.rb")
         exec ":!ruby test.rb"
-    end
+    else
+        echo "Test file not found (maybe run `set testfile=...)"
+    endif
 endfunction
 
-nnoremap <CR> :call RunTests()<CR>
+function! RailsTests() " ONLY use the rakefile for running tests (for rails)
+    nnoremap <CR> :!rake test<CR>
+endfunction
+
+function! RustTests()
+    :w
+    exec ":!cargo test"
+endfunction
+
+function! RemapCRToAppropriateTests()
+    :w
+    if &ft == "ruby"
+        nnoremap <CR> :call RubyTests()<CR>
+    elseif &ft == "rust"
+        nnoremap <CR> :call RustTests()<CR>
+    endif
+endfunction
+
+" call RemapCRToAppropriateTests()
+au BufRead,BufNewFile * :call RemapCRToAppropriateTests()
+
+function! TypeCheck()
+    :w
+    if &ft == "haskell"
+        exec ":!ghc -Wall " . expand("%:p") . " --make"
+    elseif &ft == "rust"
+        exec ":!rustc " . expand("%:p")
+    endif
+endfunction
 
 " --- Language and Build Settings ---
 
@@ -167,10 +206,14 @@ autocmd BufRead *.scm setl makeprg=racket\ %
 autocmd BufRead *.rkt setl makeprg=racket\ %
 
 " Reasoned Schemer
-set lispwords+=run*,run,fresh,conde
+set lispwords+=run*,run,fresh,conde,λ
 syn keyword racketFunc nullo pairo cdro conso caro conde ==
-syn keyword racketSyntax run run* fresh conde else
+syn keyword racketSyntax run run* fresh conde else λ
 syn keyword racketBoolean %s %u
+
+" Essentials of Programming Languages
+set lispwords+=cases,define-datatype
+syn keyword racketSyntax cases define-datatype
 
 " SML
 autocmd BufRead *.sml setl makeprg=sml\ <%

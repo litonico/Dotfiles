@@ -6,9 +6,13 @@
 [alias]
 	lo = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit
 	st = status
-	aa = add -A
+	aa = add --all
 	ci = commit
-    pull = pull --rebase
+    co = checkout
+    amend = commit --amend
+    pullff = pull --ff-only
+    dc = diff --cached
+
     down = pull --rebase
     onup = push
 [core]

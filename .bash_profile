@@ -8,6 +8,7 @@ else
 fi
 
 ##### Aliases #####
+alias vi="vim"
 alias r="rails"
 alias ls='ls -G'
 cd() { builtin cd "$@" && pwd && ls; }

@@ -1,0 +1,35 @@
+[user]
+	email = lito.nicolai@gmail.com
+	name = Lito Nicolai
+[push]
+	default = simple
+[alias]
+	lo = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit
+	st = status
+	aa = add --all
+	ci = commit
+    co = checkout
+    amend = commit --amend
+    pullff = pull --ff-only
+    dc = diff --cached
+    pull = pull --rebase
+    rb = rebase
+
+    down = pull --rebase
+    onup = push
+[user]
+    email = lito@carezone.com
+    name = Lito Nicolai
+
+[core]
+	excludesfiles = ~/.gitignore_global
+	excludesfile = /Users/Lito/.gitignore_global
+
+[rerere]
+    enabled = 1
+
+[rebase]
+    autosquash = true
+
+[push]
+    default = current

@@ -93,6 +93,9 @@ nnoremap src :source ~/.vimrc<CR>
 nnoremap K <Nop>
 " Note- insta-`man` could be useful at some point...
 
+" Strip Whitespace
+nnoremap <leader>s :StripWhitespace<CR>
+
 " Change pwd to current file's directory
 nnoremap cd. :cd %:p:h<CR>
 

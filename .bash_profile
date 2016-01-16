@@ -35,6 +35,10 @@ get_git_branch()
 }
 export PS1="\u:\W\$(get_git_branch)\$ "
 
+##
+fix() {
+ls; clear; ls; clear;
+}
 
 ##### PATH stuff #####
 # Rbenv stupidity
@@ -45,3 +49,11 @@ PATH=$PATH:/Applications/Racket\ v6.1.1/bin:
 
 # Added by the Heroku Toolbelt
 export PATH="/usr/local/heroku/bin:$PATH"
+
+export CDPATH=":~/Projects:~/Problems_and_Practice"
+
+# Brew
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+    . $(brew --prefix)/etc/bash_completion
+fi
+source ~/.git-completion.bash

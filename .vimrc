@@ -54,9 +54,6 @@ set wildignore+=*/tmp/*cache/**
 set wildignore+=*/tmp/locale_assets/**
 set wildignore+=*/tmp/letter_opener/**
 
-" Ctrl-P settings
-let g:ctrlp_working_path_mode = 'ra'
-
 " Command line autocomplete
 set wildmenu
 
@@ -113,7 +110,7 @@ nnoremap <silent> gl "_yiw:s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR><c-o>/\w\+\
 " swap left
 nnoremap <silent> gh "_yiw?\w\+\_W\+\%#<CR>:s/\(\%#\w\+\)\(\_W\+\)\(\w\+\)/\3\2\1/<CR><c-o><c-l>
 
-" c/o Gary Bernhardt
+" GRB tab fix
 function! InsertTabWrapper()
     let col = col('.') - 1
     if !col || getline('.')[col - 1] !~ '\k'
@@ -126,50 +123,130 @@ endfunction
 inoremap <tab> <c-r>=InsertTabWrapper()<cr>
 inoremap <s-tab> <c-n>
 
-let testfile = "test.rb" " TODO
-" --- Test runner ---
-function! RubyTests()
-    :w
-    if filereadable("scripts/test")
-        exec ":!sh scripts/test"
-    elseif filereadable("Rakefile")
-        exec ":!rake test"
-    elseif filereadable("test.rb")
-        exec ":!ruby test.rb"
+" GRB Rspec test utils
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" SWITCH BETWEEN TEST AND PRODUCTION CODE
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! OpenTestAlternate()
+    let new_file = AlternateForCurrentFile()
+    exec ':e ' . new_file
+endfunction
+function! AlternateForCurrentFile()
+    let current_file = expand("%")
+    let new_file = current_file
+    let in_spec = match(current_file, '^spec/') != -1
+    let going_to_spec = !in_spec
+    let in_app = match(current_file, '\<controllers\>') != -1 || match(current_file, '\<models\>') != -1 || match(current_file, '\<views\>') != -1 || match(current_file, '\<helpers\>') != -1
+    if going_to_spec
+        if in_app
+            let new_file = substitute(new_file, '^app/', '', '')
+        end
+        let new_file = substitute(new_file, '\.e\?rb$', '_spec.rb', '')
+        let new_file = 'spec/' . new_file
     else
-        echo "Test file not found (maybe run `set testfile=...)"
+        let new_file = substitute(new_file, '_spec\.rb$', '.rb', '')
+        let new_file = substitute(new_file, '^spec/', '', '')
+        if in_app
+            let new_file = 'app/' . new_file
+        end
     endif
+    return new_file
 endfunction
+nnoremap <leader>. :call OpenTestAlternate()<cr>
 
-function! RailsTests() " ONLY use the rakefile for running tests (for rails)
-    nnoremap <CR> :!rake test<CR>
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" RUNNING TESTS
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! MapCR()
+    nnoremap <cr> :call RunTestFile()<cr>
 endfunction
+call MapCR()
+nnoremap <leader>T :call RunNearestTest()<cr>
+nnoremap <leader>a :call RunTests('')<cr>
+nnoremap <leader>c :w\|:!script/features<cr>
+" nnoremap <leader>w :w\|:!script/features --profile wip<cr>
 
-function! RustTests()
-    :w
-    exec ":!cargo test"
-endfunction
-
-function! RemapCRToAppropriateTests()
-    :w
-    if &ft == "ruby"
-        nnoremap <CR> :call RubyTests()<CR>
-    elseif &ft == "rust"
-        nnoremap <CR> :call RustTests()<CR>
+function! RunTestFile(...)
+    if a:0
+        let command_suffix = a:1
+    else
+        let command_suffix = ""
     endif
+
+    " Run the tests for the previously-marked file.
+    let in_test_file = match(expand("%"), '\(.feature\|_spec.rb\|_test.py|_spec.js.coffee\)$') != -1
+    if in_test_file
+        call SetTestFile(command_suffix)
+    elseif !exists("t:running_test_file")
+        return
+    end
+    call RunTests(t:running_test_file)
 endfunction
 
-" call RemapCRToAppropriateTests()
-au BufRead,BufNewFile * :call RemapCRToAppropriateTests()
-
-function! TypeCheck()
-    :w
-    if &ft == "haskell"
-        exec ":!ghc -Wall " . expand("%:p") . " --make"
-    elseif &ft == "rust"
-        exec ":!rustc " . expand("%:p")
-    endif
+function! RunNearestTest()
+    let spec_line_number = line('.')
+    call RunTestFile(":" .  spec_line_number)
 endfunction
+
+function!  SetTestFile(command_suffix)
+    " Set the spec file that tests will be run for.
+    let t:running_test_file=@% .  a:command_suffix
+endfunction
+
+function!  RunTests(filename)
+    " Write the file and run tests for the given filename
+    if expand("%") != ""
+        :w
+    end
+    if match(a:filename, '\.feature$') != -1
+        exec ":!script/features " . a:filename
+    else
+        "First choice: project-specific test script
+        if filereadable("script/test")
+            exec ":!script/test " .  a:filename
+            " Fall back to the .test-commands pipe if available, assuming someone
+            " " is reading the other side and running the commands
+        elseif filewritable(".test-commands")
+            let cmd = 'rspec --color --format progress --require "~/lib/vim_rspec_formatter" --format VimFormatter --out tmp/quickfix'
+            exec ":!echo " .  cmd .  " " .  a:filename .  " > .test-commands" 
+            " Write an empty string to block until the command completes
+            sleep 100m " milliseconds
+            :!echo > .test-commands
+            redraw!
+            " Fall back to a blocking test run with Bundler
+        elseif filereadable("Gemfile")
+            exec ":!bundle exec rspec --color " .  a:filename
+            " Fall back to a normal blocking test run
+        elseif match(a:filename, '\.js\.coffee$') != -1
+            exec ":!rake spec:javascript SPEC=" . a:filename
+        else
+            exec ":!rspec --color " .  a:filename
+        end
+    end
+endfunction
+
+
+" L's utils
+function! GitBlameFile()
+    exec ":!git blame " . expand("%") . " -f"
+endfunction
+nnoremap <leader>B :call GitBlameFile()<cr>
+
+function! GitBlameLine()
+    let line_number = line('.')
+    exec ":!git blame " . expand("%") . " -f -L " . line_number . "," . line_number " | awk '{print $3, $4}' | sed 's/(//g'"
+endfunction
+nnoremap <leader>b :call GitBlameLine()<cr>
+
+
+" --- Plugin Settings ---
+
+" Syntastic
+let g:syntastic_javascript_checkers = ['eslint']
+
+" Ctrl-P
+let g:ctrlp_working_path_mode = 'ra'
+
 
 " --- Language and Build Settings ---
 
@@ -205,8 +282,10 @@ autocmd FileType elm setl ai sw=2 sts=2 et
 autocmd BufRead *.rs setl makeprg=cargo\ run
 
 " Javascript (V8)
-autocmd BufRead *.js setl makeprg=v8\ %
 autocmd FileType javascript setl ai sw=2 sts=2 et
+
+" CoffeeScript
+autocmd FileType coffee setl ai sw=2 sts=2 et
 
 " Markdown
 autocmd BufRead *.md setl makeprg=redcarpet\ %\ >/tmp/%<.html

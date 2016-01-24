@@ -29,11 +29,18 @@ get_git_branch()
 {
     git branch 2> /dev/null |
     grep \* |
-    sed "s/\*[[:space:]]//g" |
-    sed "s/^/(/g" |
-    sed "s/$/)/g"
+    sed "s/\*[[:space:]]//g"
 }
-export PS1="\u:\W\$(get_git_branch)\$ "
+get_git_remote()
+{
+    basename 2> /dev/null -s .git \
+        $(git remote -v 2> /dev/null |
+          grep origin |
+          grep fetch |
+          awk '{print $2}')
+}
+
+export PS1="\u:\W(\[\033[32m\]\$(get_git_remote):\$(get_git_branch)\[\033[00m\])\$ "
 
 ##
 fix() {

@@ -66,3 +66,6 @@ alias unhitch='hitch -u'
 
 # Uncomment to persist pair info between terminal instances
 # hitch
+
+# Racket
+PATH=$PATH:/Applications/Racket\ v6.3/bin:

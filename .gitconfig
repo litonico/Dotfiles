@@ -18,6 +18,9 @@
     pull = pull --rebase
     rb = rebase
 
+    drop = "!git checkout -f"
+    unstage = "!git reset HEAD"
+
     down = pull --rebase
     onup = push
 [user]

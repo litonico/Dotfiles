@@ -12,7 +12,6 @@ fi
 
 
 ##### Aliases #####
-alias vi="vim"
 alias r="rails"
 alias ls='ls -G'
 alias ag='ag --path-to-agignore=~/.agignore'

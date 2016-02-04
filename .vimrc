@@ -15,7 +15,8 @@ set expandtab " In this floating world, all is spaces
 set tabstop=4 " See language sections for lang-specific tabs and shifts
 set shiftwidth=4
 set number " Line Numbers
-set ignorecase " I HATE case-sensitive search
+set cursorline
+set ignorecase smartcase " Case-insensitive, unless there's a capital letter
 set ruler " Line and Character count
 set ls=2 " display filename at the bottom-left
 set backspace=2 " Can delete anything I please
@@ -41,7 +42,7 @@ set winwidth=84
 let NERDTreeWinSize = 31 " Size of the NT file browser, when it's up
 
 " " Load Bash settings and $PATH
-" set shell=/bin/bash\ -li
+set shell=/bin/bash\ -li
 
 " Command-T/Ctrl-P ignores
 " Home dir stuff:
@@ -61,6 +62,9 @@ set wildmenu
 " --- Key mappings ---
 inoremap jk <esc>
 cnoremap jk <esc>
+
+" Yank to clipboard
+map <leader>y "+y
 
 " Whitespace
 nnoremap <leader>s :StripWhitespace<CR>
@@ -160,6 +164,9 @@ nnoremap <leader>. :call OpenTestAlternate()<cr>
 function! MapCR()
     nnoremap <cr> :call RunTestFile()<cr>
 endfunction
+"That's awesome, but it breaks the quickfix buffer
+autocmd BufReadPost quickfix nnoremap <buffer> <CR> <CR>
+
 call MapCR()
 nnoremap <leader>T :call RunNearestTest()<cr>
 nnoremap <leader>a :call RunTests('')<cr>

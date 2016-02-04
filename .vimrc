@@ -41,8 +41,8 @@ set winheight=30
 set winwidth=84
 let NERDTreeWinSize = 31 " Size of the NT file browser, when it's up
 
-" " Load Bash settings and $PATH
-set shell=/bin/bash\ -li
+" Load Bash settings and $PATH
+" set shell=/bin/bash\ -li
 
 " Command-T/Ctrl-P ignores
 " Home dir stuff:
@@ -257,66 +257,75 @@ let g:ctrlp_working_path_mode = 'ra'
 
 " --- Language and Build Settings ---
 
-" C
-autocmd BufRead *.c set makeprg=cd\ %:p:h\ &&\ make
-nnoremap <D-r> :update<CR>:make run<CR>
-nnoremap <D-b> :update<CR>:make<CR>
-" Macros for C header files
-au BufNewFile *.h :r !echo -e "#ifndef expand(%)\n #define expand(%)\n #endif
+augroup filetype_c
+    autocmd BufRead *.c set makeprg=cd\ %:p:h\ &&\ make
+    nnoremap <D-r> :update<CR>:make run<CR>
+    nnoremap <D-b> :update<CR>:make<CR>
+    " Macros for C header files
+    au BufNewFile *.h :r !echo -e "#ifndef expand(%)\n #define expand(%)\n #endif
+    "This would be cool if I could make it work:
+    "if !filereadable(expand("%:p:h")."/Makefile")
+    "    setlocal makeprg=gcc\ -Wall\ -Wextra\ -o\ %<\ %
+    "endif
+augroup end
 
-"This would be cool if I could make it work:
-"if !filereadable(expand("%:p:h")."/Makefile")
-"    setlocal makeprg=gcc\ -Wall\ -Wextra\ -o\ %<\ %
-"endif
 
-" Python
-autocmd BufRead *.py setl makeprg=python3\ %
+augroup filetype_python
+    autocmd FileType python compiler python3
+augroup end
 
-" Latex (I can't figure this one out)
+augroup filetype_latex
+" (I can't figure this one out)
 " autocmd BufRead *.tex set makeprg=latexmk\-cd\ -e\ \\\\$pdflatex\ =\ 'escape(%)E\ -interaction=nonstopmode\ -synctex=1\ escape(%)S\ escape(%)O'\ -silent\ -f\ -pdf
+augroup end
 
-" Ruby
-autocmd BufRead *.rb setl makeprg=ruby\ %
-" Only two spaces
-autocmd FileType ruby setl ai sw=2 sts=2 et
-autocmd FileType erb setl ai sw=2 sts=2 et
+augroup filetype_ruby
+    autocmd BufRead *.rb setl makeprg=ruby\ %
+    autocmd FileType ruby setl ai sw=2 sts=2 et
+    autocmd FileType erb setl ai sw=2 sts=2 et
+augroup end
 
 " Elm
-autocmd BufRead *.elm setl makeprg=elm-make\ %
-autocmd FileType elm setl ai sw=2 sts=2 et
+augroup filetype_elm
+    autocmd BufRead *.elm setl makeprg=elm-make\ %
+    autocmd FileType elm setl ai sw=2 sts=2 et
+augroup filetype_elm
 
-" Rust
-autocmd BufRead *.rs setl makeprg=cargo\ run
+augroup filetype_rust
+    autocmd FileType rust setl makeprg=cargo\ run
+augroup end
 
-" Javascript (V8)
-autocmd FileType javascript setl ai sw=2 sts=2 et
+augroup filetype_javascript
+    autocmd FileType javascript setl ai sw=2 sts=2 et
+augroup end
 
-" CoffeeScript
-autocmd FileType coffee setl ai sw=2 sts=2 et
+augroup filetype_coffee
+    autocmd FileType coffee setl ai sw=2 sts=2 et
+augroup end
 
-" Markdown
-autocmd BufRead *.md setl makeprg=redcarpet\ %\ >/tmp/%<.html
-" autocmd BufRead *.md set makeprg
+augroup filetype_markdown
+    autocmd FileType markdown setl makeprg=redcarpet\ %\ >/tmp/%<.html
+augroup end
 
-" Scheme / Racket
-autocmd BufRead *.scm setl makeprg=racket\ %
-autocmd BufRead *.rkt setl makeprg=racket\ %
+augroup filetype_scheme
+    autocmd BufRead *.scm setl makeprg=racket\ %
+    autocmd BufRead *.rkt setl makeprg=racket\ %
+    " Reasoned Schemer
+    set lispwords+=run*,run,fresh,conde,λ
+    syn keyword racketFunc nullo pairo cdro conso caro conde ==
+    syn keyword racketSyntax run run* fresh conde else λ
+    syn keyword racketBoolean %s %u
+    " Essentials of Programming Languages
+    set lispwords+=cases,define-datatype
+    syn keyword racketSyntax cases define-datatype
+augroup end
 
-" Reasoned Schemer
-set lispwords+=run*,run,fresh,conde,λ
-syn keyword racketFunc nullo pairo cdro conso caro conde ==
-syn keyword racketSyntax run run* fresh conde else λ
-syn keyword racketBoolean %s %u
-
-" Essentials of Programming Languages
-set lispwords+=cases,define-datatype
-syn keyword racketSyntax cases define-datatype
-
-" SML
-autocmd BufRead *.sml setl makeprg=sml\ <%
+augroup filetype_sml
+    autocmd BufRead *.sml setl makeprg=sml\ <%
+augroup end
 
 " Haskell
-" cmd-B to compile
-autocmd BufRead *.hs set makeprg=cd\ %:p:h\ &&\ ghc\ -Wall\ %:p\ --make\ &&\ ./%:r
-" cmd-R to run
-autocmd BufRead *.hs nnoremap <D-r> :!runhaskell %<CR>
+augroup filetype_haskell
+    autocmd BufRead *.hs set makeprg=cd\ %:p:h\ &&\ ghc\ -Wall\ %:p\ --make\ &&\ ./%:r
+    autocmd BufRead *.hs nnoremap <CR> :!runhaskell %<CR>
+augroup end

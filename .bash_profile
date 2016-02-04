@@ -41,7 +41,9 @@ alias re_db='rake db:populate && rake db:migrate && rake db:test:prepare'
 alias railstests='bundle exec rspec --exclude-pattern "spec/feature/*"'
 alias rspec='bundle exec \rspec'
 alias rake='bundle exec \rake'
-alias deploy='rake deploy:i_feel_lucky'
+alias deploy='rake deploy:i_feel_lucky && terminal-notifier \
+                                          -message "Done" \
+                                          -title "Deploy to Staging"'
 alias cw='cd ~/CareZone/careflow'
 
 function sjrr() {

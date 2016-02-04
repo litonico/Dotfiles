@@ -6,7 +6,6 @@
 [alias]
 	lo = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit
     branch-name = "!git rev-parse --abbrev-ref HEAD"
-    lo-branch = "!git lo $(git branch-name) --not $1"
     s = show
 	st = status
 	aa = add --all
@@ -18,8 +17,11 @@
     pull = pull --rebase
     rb = rebase
 
-    drop = "!git checkout -f"
+    # Commands I'm not sure are a good idea
     unstage = "!git reset HEAD"
+    resolve = "!grep -lr '<<<<<<<' * | xargs vi"
+    lo-branch = "!git lo $(git branch-name) --not $1"
+    delete-branch = "!git branch -d $1 && git push origin --no-verify :$1"
 
     down = pull --rebase
     onup = push

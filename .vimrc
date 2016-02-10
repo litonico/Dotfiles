@@ -2,6 +2,7 @@ set noswapfile " I've lost so much work from bad swapfiles...
 set nocompatible
 
 execute pathogen#infect()
+
 syntax on
 filetype plugin on
 filetype indent on
@@ -9,8 +10,13 @@ set showcmd " Show the current command
 let mapleader=','
 
 set t_Co=256
-colorscheme jellybeans
-highlight Normal ctermbg=233
+set background=dark
+colorscheme solarized
+let g:solarized_termcolors=256
+
+" For Jellybeans dark:
+" highlight Normal ctermbg=233
+
 set expandtab " In this floating world, all is spaces
 set tabstop=4 " See language sections for lang-specific tabs and shifts
 set shiftwidth=4
@@ -65,6 +71,7 @@ cnoremap jk <esc>
 
 " Yank to clipboard
 map <leader>y "+y
+map <leader>Y "+yy
 
 " Whitespace
 nnoremap <leader>s :StripWhitespace<CR>
@@ -164,8 +171,12 @@ nnoremap <leader>. :call OpenTestAlternate()<cr>
 function! MapCR()
     nnoremap <cr> :call RunTestFile()<cr>
 endfunction
-"That's awesome, but it breaks the quickfix buffer
-autocmd BufReadPost quickfix nnoremap <buffer> <CR> <CR>
+
+"That's awesome, but it breaks the quickfix/loclist buffer and the cmd window
+augroup fix_map_cr
+    autocmd BufReadPost quickfix nnoremap <buffer> <CR> <CR>
+    autocmd CmdwinEnter nnoremap <CR> <CR> " Of course, this doesn't work
+augroup end
 
 call MapCR()
 nnoremap <leader>T :call RunNearestTest()<cr>
@@ -250,7 +261,8 @@ nnoremap <leader>b :call GitBlameLine()<cr>
 
 " Syntastic
 let g:syntastic_javascript_checkers = ['eslint']
-
+let g:syntastic_always_populate_loc_list = 1
+nnoremap <leader>l :ll<CR>
 " Ctrl-P
 let g:ctrlp_working_path_mode = 'ra'
 
@@ -258,6 +270,7 @@ let g:ctrlp_working_path_mode = 'ra'
 " --- Language and Build Settings ---
 
 augroup filetype_c
+    autocmd!
     autocmd BufRead *.c set makeprg=cd\ %:p:h\ &&\ make
     nnoremap <D-r> :update<CR>:make run<CR>
     nnoremap <D-b> :update<CR>:make<CR>
@@ -271,43 +284,52 @@ augroup end
 
 
 augroup filetype_python
+    autocmd!
     autocmd FileType python compiler python3
 augroup end
 
 augroup filetype_latex
+    autocmd!
 " (I can't figure this one out)
 " autocmd BufRead *.tex set makeprg=latexmk\-cd\ -e\ \\\\$pdflatex\ =\ 'escape(%)E\ -interaction=nonstopmode\ -synctex=1\ escape(%)S\ escape(%)O'\ -silent\ -f\ -pdf
 augroup end
 
 augroup filetype_ruby
-    autocmd BufRead *.rb setl makeprg=ruby\ %
+    autocmd!
+    autocmd FileType ruby setl makeprg=ruby\ %
     autocmd FileType ruby setl ai sw=2 sts=2 et
     autocmd FileType erb setl ai sw=2 sts=2 et
 augroup end
 
 " Elm
 augroup filetype_elm
+    autocmd!
     autocmd BufRead *.elm setl makeprg=elm-make\ %
     autocmd FileType elm setl ai sw=2 sts=2 et
 augroup filetype_elm
 
 augroup filetype_rust
+    autocmd!
     autocmd FileType rust setl makeprg=cargo\ run
 augroup end
 
 augroup filetype_javascript
+    autocmd!
     autocmd FileType javascript setl ai sw=2 sts=2 et
 augroup end
 
 augroup filetype_coffee
+    autocmd!
     autocmd FileType coffee setl ai sw=2 sts=2 et
 augroup end
 
 augroup filetype_markdown
+    autocmd!
     autocmd FileType markdown setl makeprg=redcarpet\ %\ >/tmp/%<.html
 augroup end
 
 augroup filetype_scheme
+    autocmd!
     autocmd BufRead *.scm setl makeprg=racket\ %
     autocmd BufRead *.rkt setl makeprg=racket\ %
     " Reasoned Schemer
@@ -326,6 +348,7 @@ augroup end
 
 " Haskell
 augroup filetype_haskell
+    autocmd!
     autocmd BufRead *.hs set makeprg=cd\ %:p:h\ &&\ ghc\ -Wall\ %:p\ --make\ &&\ ./%:r
     autocmd BufRead *.hs nnoremap <CR> :!runhaskell %<CR>
 augroup end

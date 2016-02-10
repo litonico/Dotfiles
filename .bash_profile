@@ -1,7 +1,12 @@
+# chruby
 source /usr/local/share/chruby/chruby.sh
 source /usr/local/share/chruby/auto.sh
 
+# Git completion
 source ~/git-completion.bash
+
+# Editor
+export EDITOR='mvim'
 
 # This may help vim break less often when using xterm-256?
 if [ -e /usr/share/terminfo/x/xterm-256color ]; then

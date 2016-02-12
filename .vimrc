@@ -139,9 +139,11 @@ inoremap <s-tab> <c-n>
 " SWITCH BETWEEN TEST AND PRODUCTION CODE
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! OpenTestAlternate()
-    let new_file = AlternateForCurrentFile()
+    let current_file = expand("%")
+    let new_file = system('ruby ~/scripts/rails_test_alternate.rb ' . current_file)
     exec ':e ' . new_file
 endfunction
+
 function! AlternateForCurrentFile()
     let current_file = expand("%")
     let new_file = current_file
@@ -163,6 +165,7 @@ function! AlternateForCurrentFile()
     endif
     return new_file
 endfunction
+
 nnoremap <leader>. :call OpenTestAlternate()<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

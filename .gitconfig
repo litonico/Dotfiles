@@ -8,6 +8,7 @@
 [alias]
 	lo = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit
     s = show
+    d = diff
 	st = status
 	aa = add --all
 	ci = commit
@@ -20,10 +21,10 @@
     cos = "!git branch | cut -c 3- | selecta | xargs git co"
     branch-name = "!git rev-parse --abbrev-ref HEAD"
     lo-branch = "!git lo $(git branch-name) --not $1"
+    resolve = "!ag -l '<<<<<<<' | xargs $EDITOR"
 
     # Commands I'm not sure are a good idea
     unstage = "!git reset HEAD"
-    resolve = "!ag -l '<<<<<<<' * | xargs $EDITOR"
     delete-branch = "!git branch -d $1 && git push origin --no-verify :$1"
 
     down = pull --rebase

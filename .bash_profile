@@ -51,6 +51,9 @@ ls; clear; ls; clear;
 # Rbenv stupidity
 export PATH="~/.rbenv/shims:$PATH"
 
+# Brew linking
+export LIBRARY_PATH="$LIBRARY_PATH:/usr/local/lib"
+
 # Racket
 PATH=$PATH:/Applications/Racket\ v6.1.1/bin:
 

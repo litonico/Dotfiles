@@ -118,6 +118,8 @@ endfunction
 inoremap <tab> <c-r>=InsertTabWrapper()<cr>
 inoremap <s-tab> <c-n>
 
+nnoremap <space> :w<CR>
+
 let testfile = "test.rb" " TODO
 " --- Test runner ---
 function! RubyTests()
@@ -207,6 +209,8 @@ autocmd BufRead *.md setl makeprg=redcarpet\ %\ >/tmp/%<.html
 " Scheme / Racket
 autocmd BufRead *.scm setl makeprg=racket\ %
 autocmd BufRead *.rkt setl makeprg=racket\ %
+autocmd BufRead *.rkt nnoremap <CR> :make
+autocmd FileType racket setl ai sw=2 sts=2 et
 
 " Reasoned Schemer
 set lispwords+=run*,run,fresh,conde,λ
